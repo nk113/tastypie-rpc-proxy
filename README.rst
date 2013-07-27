@@ -109,7 +109,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
         album = fields.ForeignKey(Album, 'album')
         (...)
 
-Configure URLs, separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``.
+Configure URLs, separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
 
 ::
 
@@ -119,9 +119,19 @@ Configure URLs, separate metadata resources from Item resource to demonstrate na
 
     meta_api = Api(api_name='meta')
     meta_api.register(resources.Album())
-    meta_api.register(resources.AlbumLocalization()proxy* classes by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
+    meta_api.register(resources.AlbumLocalization())
+    (...)
+
+    urlpatterns = patterns('',
+        # v1
+        url(r'^api/v1/', include(core_api.urls)),
+        url(r'^api/v1/', include(meta_api.urls)),
+        # v2
+        # ...
+    )
 
 ::
+
     (...)
     from apps.test.models import ITEM_TYPES, META_TYPES
 
