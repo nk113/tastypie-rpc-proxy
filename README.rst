@@ -6,13 +6,13 @@ tastypie-rpc-proxy
     :alt: Build Status
     :target: http://travis-ci.org/nk113/tastypie-rpc-proxy
 
-The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`_ - many kudos to the author, is to help coding `tastypie`_ based RPC in easy manner. You can handle remote `tastypie`_ resources as if operating over local `django`_ model objects. Now you don't need to code your business logics and unit tests for both central `django`_ models and API client to read the central data from remote boxes separately - in other word you can deploy the same application code for central API and remote client, **rpc-proxy** looks after everything for you. Don't you think it's convenient if you can code like below to control remote object behind `tastypie`_ API?
+The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`_ - many kudos to the author, is to help coding `tastypie`_ based RPC in easy manner. You can handle remote `tastypie`_ resources as if operating over local `django`_ model objects. Now you don't need to code your business logics and unit tests for both central `django`_ models and API client to read the central data from remote boxes separately - in other word you can deploy the same application code for central API and remote client, **rpc_proxy** looks after everything for you. Don't you think it's convenient if you can code like below to control remote object behind `tastypie`_ API?
 
 ::
 
     title_ja = Track.objects.get(item__source_item_id__startswith='t-2').localize('ja').title
 
-As you know, this code also works perfectly with local `django`_ model. The proxy class tries to access remote `tastypie`_ resources if *API_URL* settings is provided, and to read local model resources if it's not. All right, take a look once at how **rpc-proxy** works. The **rpc-proxy** also can be used as a simple tastypie client which has similar interfaces as `django`_ queryset API.
+As you know, this code also works perfectly with local `django`_ model. The proxy class tries to access remote `tastypie`_ resources if *API_URL* settings is provided, and to read local model resources if it's not. All right, take a look once at how **rpc_proxy** works. The **rpc_proxy** also can be used as a simple tastypie client which has similar interfaces as `django`_ queryset API.
 
 Features enhanced from tastypie-queryset-client
 ===============================================
@@ -28,17 +28,18 @@ etc.
 Notes
 =====
 
-* setting up `django`_ cache backend is strongly recommended to reduce API requests 
+* setting up `django`_ cache backend is strongly recommended to reduce API requests.
+* defining `tastypie`_ resources inheriting *rpc_proxy.resources.ModelResource* is strongly recommended to fully support foreign key operations. 
 
 Quick Start
 ===========
 
-``apps/test`` application is good to start with. Following section goes through the application to describe what you can enjoy from **rpc-proxy**. See the ``apps/test`` application code for the implementation in detail. This test application has models that represent common music data scheme - Album, Track metadata and these localisations. The Item model associates them as parent and child relationship.
+``apps/test`` application is good to start with. Following section goes through the application to describe what you can enjoy from **rpc_proxy**. See the ``apps/test`` application code for the implementation in detail. This test application has models that represent common music data scheme - Album, Track metadata and these localizations. The Item model associates them as parent and child relationship.
 
 Define models
 -------------
 
-Define `django`_ models as usual. The model methods will be implemented on *proxy* classes later instead of on the models so just define model fields here - ``apps/test/models.py``.
+First of all, define `django`_ models as usual. The model methods will be implemented on *proxy* classes later instead of on the models so just define model fields here - ``apps/test/models.py``.
 
 ::
 
@@ -69,9 +70,12 @@ Define `django`_ models as usual. The model methods will be implemented on *prox
 Define resources
 ----------------
 
-Design `tastypie`_ resources carefully. Might need to have various filters, orderings and access controls - ``apps/test/resources.py``.
+Design `tastypie`_ resources carefully. Might need to have various filters, orderings and access controls - ``apps/test/resources.py``. The resources should be defined inheriting *rpc_proxy.resources.ModelResource* class to support foreign key operations.
 
 ::
+
+    (...)
+    from rpc_proxy import resources
 
     (...)
     class Item(resources.ModelResource):
@@ -112,7 +116,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
 Configure URLs
 --------------
 
-separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
+Separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
 
 ::
 
@@ -136,7 +140,7 @@ separate metadata resources from Item resource to demonstrate namespaces - ``app
 Create proxies
 --------------
 
-Now it's time to code proxy, ``proxies.py`` is expected as script name for *proxy* classes by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
+Now it's time to code proxy, ``proxies.py`` is expected filename of the module *proxy* classes are default by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
 
 ::
 
@@ -334,7 +338,7 @@ Unit tests for proxy classes can be ran in both local `django`_ model and remote
 As a simple tastypie client
 ===========================
 
-You can also utilize **rpc-proxy** with no proxy definition - call remote tastypie API with queryset interface. In this case you can just only control remote resources with standard CRUD / REST manner `Tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
+You can also utilize **rpc_proxy** with no proxy definition - call remote tastypie API with queryset interface. In this case you can just only control remote resources with standard CRUD / REST manner `Tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
 
 ::
 
@@ -389,7 +393,7 @@ abstract
 api_url
 -------
 
-*String*, optional, base url prefix of the root API endpoint, if not given **rpc-proxy** tries to load corresponding django model in local.
+*String*, optional, base url prefix of the root API endpoint, if not given **rpc_proxy** tries to load corresponding django model in local.
 
 auth
 ----
@@ -424,7 +428,7 @@ version
 Settings
 ========
 
-**rpc-proxy** accepts following settings variables defined as **TASTYPIE_RPC_PROXY** dictionary in `django`_ settings. The settings look like:
+**rpc_proxy** accepts following settings variables defined as **TASTYPIE_RPC_PROXY** dictionary in `django`_ settings. The settings look like:
 
 ::
 
@@ -444,7 +448,7 @@ API_NAMESPACE
 API_URL
 -------
 
-String, optional, defines default base prefix URL of remote tastypie API, **rpc-proxy** loads local models as proxy class if this is not specified e.g. ``'https://example.com/django/app/api'``.
+String, optional, defines default base prefix URL of remote tastypie API, **rpc_proxy** loads local models as proxy class if this is not specified e.g. ``'https://example.com/django/app/api'``.
 
 .. note:: This value could technically be updated dynamically but it does not take any effect until the application is reloaded.  
 
