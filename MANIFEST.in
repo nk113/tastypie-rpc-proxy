@@ -1,0 +1,6 @@
+recursive-include docs *
+recursive-include rpc_proxy *.json
+
+include LICENSE
+include README.rst
+include VERSION

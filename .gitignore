@@ -1,4 +1,14 @@
+*~
+*.db
+*.egg*
 *.log
 *.pot
 *.pyc
-local_settings.py
+.DS_Store
+.noseids
+.tox
+bin
+build
+dist
+env
+virtualenv.py

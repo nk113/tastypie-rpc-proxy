@@ -1,0 +1,10 @@
+# latest revision
+Django
+django-nose
+mock
+python-memcached
+tastypie-queryset-client
+tox
+
+# specific revision
+-e git+https://github.com/toastdriven/django-tastypie.git#egg=django-tastypie
