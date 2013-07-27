@@ -64,7 +64,6 @@ def mock_cache_set(key, value, timeout=None):
     pass
 
 def mock_api(func, **decorator_kwargs):
-    # @patch.dict(proxy_settings, API_URL='/api/')
     @patch('requests.sessions.Session.request', mock_request)
     @patch('tastypie.cache.SimpleCache.set', mock_cache_set)
     @wraps(func)
