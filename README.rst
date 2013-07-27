@@ -6,13 +6,29 @@ tastypie-rpc-proxy
     :alt: Build Status
     :target: http://travis-ci.org/nk113/tastypie-rpc-proxy
 
-The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`_ - many kudos to the author, is to help coding `tastypie`_ based RPC in easy manner. You can handle remote `tastypie`_ resources as if operating over local `django`_ model objects. Now you don't need to code your business logics and unit tests for both central `django`_ models and API client to read the central data from remote boxes separately - in other word you can deploy the same application code for central API and remote client, **rpc_proxy** looks after everything for you. Don't you think it's convenient if you can code like below to control remote object behind `tastypie`_ API?
+The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`_ - many kudos to the author, is to help coding `tastypie`_ based RPC in easy manner. With **rpc_proxy** you can handle remote `tastypie`_ resources as if operating over local `django`_ model objects. Now you don't need to code your business logics and unit tests for both central `django`_ models and API client to read the central data from remote boxes separately - in other word you can deploy the same application code for central API and remote client, **rpc_proxy** looks after everything for you. Don't you think it's convenient if you can code like below to control remote object behind `tastypie`_ API?
 
 ::
 
     title_ja = Track.objects.get(item__source_item_id__startswith='t-2').localize('ja').title
 
-As you know, this code also works perfectly with local `django`_ model. The proxy class tries to access remote `tastypie`_ resources if *API_URL* settings is provided, and to read local model resources if it's not. All right, take a look once at how **rpc_proxy** works. The **rpc_proxy** also can be used as a simple tastypie client which has similar interfaces as `django`_ queryset API.
+As you see, this code is 100% compatible with `django`_ model / queryset api terminology. In normal situation you might need to write following unreadable code to fetch the same data as above:
+
+::
+
+    headers = {'content-type': 'application/json'}
+    auth = ('test', 'test',)
+    filters = {
+        'track__item__source_item_id__startswith': 't-2',
+        'language_code': 'ja',
+    }
+    response = requests.get('http://127.0.0.1:8000/api/v1/meta/tracklocalization/',
+                            params=filters,
+                            headers=headers,
+                            auth=auth)
+    title_ja = response.json()['objects'][0]['title']
+
+Isn't this boring? **rpc_proxy** is intended for getting you out of this sort of situation. The proxy class tries to access remote `tastypie`_ resources if *API_URL* settings is provided, and to read local models if it's not. All right, take a look once at how **rpc_proxy** works. The **rpc_proxy** also can be used as a simple tastypie client which has similar interfaces as `django`_ queryset API.
 
 Features enhanced from tastypie-queryset-client
 ===============================================
