@@ -328,11 +328,6 @@ auth
 
 *Tuple* or *List*, optional, a convination of username and password to access the API e.g. ``(username, password,)``. SUPERUSER_USERNAME and SUPERUSER_PASSWORD settings variables will be applied by default.
 
-auth
-----
-
-*Tuple* or *List*, optional, a convination of username and password to access the API e.g. ``(username, password,)``. SUPERUSER_USERNAME and SUPERUSER_PASSWORD settings variables will be applied by default.
-
 client
 ------
 
