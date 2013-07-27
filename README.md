@@ -1,2 +1,0 @@
-tastypie-proxy-client
-=====================
