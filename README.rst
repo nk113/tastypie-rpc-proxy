@@ -246,7 +246,7 @@ Now it's time to code proxy, ``proxies.py`` is expected filename of the module *
 Import proxies
 --------------
 
-All right, let's call those proxies with the ``manage.py shell``. After loading fixture, import them with no `API_URL` settings like below, then you can see accesses to the local models:
+All right, let's call those proxies with the ``manage.py shell``. After loading fixture, import them with no *API_URL* settings like below, then you can see accesses to the local models:
 
 ::
 
@@ -280,7 +280,7 @@ All right, let's call those proxies with the ``manage.py shell``. After loading 
     >>> t_en.title
     'A Pop Song 1 revised title'
 
-OK then reset database and let's do the same things with `API_URL` settings, you can find that the proxy calls remote `tastypie`_ API this time:
+OK then reset database and let's do the same things with *API_URL* settings, you can find that the proxy calls remote `tastypie`_ API this time:
 
 ::
 
@@ -455,7 +455,7 @@ String, optional, defines default base prefix URL of remote tastypie API, **rpc_
 API_VERSION
 -----------
 
-String, optional, defines default versioning of remote API follows to API_URL e.g. ``'v1'``.
+String, optional, defines default versioning of remote API follows to *API_URL* e.g. ``'v1'``.
 
 NON_DEFAULT_ID_FOREIGNKEYS
 --------------------------
