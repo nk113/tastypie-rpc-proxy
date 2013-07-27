@@ -401,6 +401,11 @@ client
 
 *ProxyClient* class, optional, intended for extending ProcxyClient class, *ProxyClient* class by default.
 
+model
+-----
+
+`django`_ *Model* class, optional, a model that proxy loads when *API_URL* is not provided in the settings, if this option is not given, the proxy class looks for corresponding model class which has the same name as the proxy on ``models.py`` module in the same module as ``proxies.py`` belongs, by default.
+
 namespace
 ---------
 
