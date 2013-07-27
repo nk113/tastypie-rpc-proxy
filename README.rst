@@ -15,7 +15,7 @@ The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`
 As you know, this code also works perfectly with local `django`_ model. The proxy class tries to access remote `tastypie`_ resources if *API_URL* settings is provided, and to read local model resources if it's not. All right, take a look once at how **rpc-proxy** works. The **rpc-proxy** also can be used as a simple tastypie client which has similar interfaces as `django`_ queryset API.
 
 Features enhanced from tastypie-queryset-client
------------------------------------------------
+===============================================
 
 * data proxy layer, which enables switching between local model access and RPC depending on *API_URL* settings
 * API namespace
@@ -25,11 +25,10 @@ Features enhanced from tastypie-queryset-client
 
 etc.
 
-Nontes
-======
+Notes
+=====
 
-* setting up `django`_ cache backend is strongly recommended to reduce API requests
-* 
+* setting up `django`_ cache backend is strongly recommended to reduce API requests 
 
 Quick Start
 ===========
@@ -110,7 +109,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
         album = fields.ForeignKey(Album, 'album')
         (...)
 
-Configure URLs, separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
+Configure URLs, separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``.
 
 ::
 
@@ -264,8 +263,8 @@ Testing proxy code
 
 Unit tests for proxy classes can be ran in both local `django`_ model and remote `tastypie`_ API context. If you are to run the unit tests for both contexts separated settings need to be prepared - API context with *API_URL*, local model context with **NO** *API_URL* settings. Please take a look at how the unit tests for ``apps.test`` application works - see ``runtests.py`` and ``tox.ini``.
 
-As a simple `tastypie`_ client
-==============================
+As a simple tastypie client
+===========================
 
 You can also utilize **rpc-proxy** with no proxy definition - call remote tastypie API with queryset interface. In this case you can just only control remote resources with standard CRUD / REST manner `Tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
 
