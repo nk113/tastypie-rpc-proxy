@@ -349,7 +349,7 @@ Unit tests for proxy classes can be ran in both local `django`_ model and remote
 As a simple tastypie client
 ===========================
 
-You can also utilize **rpc_proxy** with no proxy definition - just call remote tastypie API with queryset interface. In this case you can only control remote resources with standard CRUD / REST manner `tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
+You can also utilize **rpc_proxy** with no proxy definition - just call remote tastypie API with queryset interface. In this case you can control remote resources with only standard CRUD / REST manner `tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
 
 ::
 
@@ -376,7 +376,7 @@ You can also utilize **rpc_proxy** with no proxy definition - just call remote t
     >>> str(album.item.children.all()[0].track) == str(track)
     True
 
-.. note:: You have to uncomment following fields on the Item resource in *apps.test.resources.py* and to clear cache to work above expectedly though.
+.. note:: You have to uncomment following fields on the Item resource in ``apps.test.resources.py`` and to clear cache to work above expectedly though.
 
 ::
 
@@ -404,27 +404,27 @@ abstract
 api_url
 -------
 
-*String*, optional, base url prefix of the root API endpoint, if not given **rpc_proxy** tries to load corresponding django model in local.
+*String*, optional, base url prefix of the API endpoint, if not given **rpc_proxy** tries to load corresponding django model in local.
 
 auth
 ----
 
-*Tuple* or *List*, optional, a convination of username and password to access the API e.g. ``(username, password,)``. SUPERUSER_USERNAME and SUPERUSER_PASSWORD settings variables will be applied by default.
+*Tuple* or *List*, optional, a combination of username and password to access the API e.g. ``(username, password,)``. SUPERUSER_USERNAME and SUPERUSER_PASSWORD settings variables will be applied by default.
 
 client
 ------
 
-*ProxyClient* class, optional, intended for extending ProcxyClient class, *ProxyClient* class by default.
+*ProxyClient* class, optional, intended for extending ProxyClient class, *ProxyClient* class by default.
 
 model
 -----
 
-`django`_ *Model* class, optional, a model that proxy loads when *API_URL* is not provided in the settings, if this option is not given, the proxy class looks for corresponding model class which has the same name as the proxy on ``models.py`` module in the same module as ``proxies.py`` belongs, by default.
+`django`_ *Model* class, optional, a model that proxy loads when *API_URL* is not provided in the settings, if this option is not given, the proxy class looks for corresponding model class which has the same name as the proxy class on ``models.py`` module in the same module as ``proxies.py`` belongs to, by default.
 
 namespace
 ---------
 
-*String*, optional, defines namespace of the resource follows to version, *API_NAMESPACE* will be applied if it's not provided.
+*String*, optional, defines namespace of the resource follows to version, *API_NAMESPACE* will be applied if it's not provided e.g. ``core``.
 
 resource_name
 -------------
@@ -476,12 +476,12 @@ Tuple or List, optional, defines custom primary key field names appear in remote
 SUPERUSER_USERNAME
 ------------------
 
-String, optional, defines default username of superuser for API authentication, useful to allow all operations over all remote resources e.g. ``'test'``.
+String, optional, defines default username of superuser for API authentication, useful to allow internal system user to operate over all remote resources e.g. ``'test'``.
 
 SUPERUSER_PASSWORD
 ------------------
 
-String, optional, defines default password of superuser for API authentication, useful to allow all operations over all remote resources e.g. ``'test'``.
+String, optional, defines default password of superuser for API authentication, useful to allow internal system user to operate over all remote resources e.g. ``'test'``.
 
 .. _tastypie-queryset-client: https://github.com/ikeikeikeike/tastypie-queryset-client
 .. _tastypie: https://github.com/toastdriven/django-tastypie
