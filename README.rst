@@ -99,6 +99,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
         children = fields.ToManyField('apps.test.resources.Item', 'children', null=True)
         (...)
 
+
     class Album(resources.ModelResource):
 
         class Meta(resources.SuperuserMeta):
@@ -149,7 +150,7 @@ Separate metadata resources from Item resource to demonstrate namespaces - ``app
 Create proxies
 --------------
 
-Now it's time to code proxy, ``proxies.py`` is expected filename of the module *proxy* classes are default by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
+Now it's time to code proxy, ``proxies.py`` is expected filename of the module *proxy* classes are defined by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
 
 ::
 
@@ -159,6 +160,7 @@ Now it's time to code proxy, ``proxies.py`` is expected filename of the module *
     (...)
     def get_default_language_code():
         return getattr(settings, 'LANGUAGE_CODE', 'en-US').split('-')[0].lower()
+
 
     (...)
     class Localizable(proxies.Proxy):
@@ -342,12 +344,12 @@ That's it! Hope this enpowers you to write clean code and reduce time to code bo
 Testing proxy code
 ==================
 
-Unit tests for proxy classes can be ran in both local `django`_ model and remote `tastypie`_ API context. If you are to run the unit tests for both contexts separated settings need to be prepared - API context with *API_URL*, local model context with **NO** *API_URL* settings. Please take a look at how the unit tests for ``apps.test`` application works - see ``runtests.py`` and ``tox.ini``.
+Unit tests for proxy classes can be ran in both local `django`_ model and remote `tastypie`_ API context. Those tests should inherit ``rpc_client.test.Proxy`` class. If you are to run the unit tests for both contexts separated settings need to be prepared - API context with *API_URL*, local model context with **NO** *API_URL* settings. Please take a look at how the unit tests for ``apps.test`` application works - see ``runtests.py`` and ``tox.ini``.
 
 As a simple tastypie client
 ===========================
 
-You can also utilize **rpc_proxy** with no proxy definition - call remote tastypie API with queryset interface. In this case you can just only control remote resources with standard CRUD / REST manner `Tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
+You can also utilize **rpc_proxy** with no proxy definition - just call remote tastypie API with queryset interface. In this case you can only control remote resources with standard CRUD / REST manner `tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
 
 ::
 
