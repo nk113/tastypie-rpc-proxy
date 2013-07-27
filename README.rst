@@ -172,8 +172,6 @@ Now it's time to code proxy, ``proxies.py`` is expected filename of the module *
         def __init_proxy__(self):
             super(Localizable, self).__init_proxy__()
 
-            class_name = self.__class__.__name__
-
             setattr(self, 'localization', getattr(import_module(self.__module__),
                                                   '%sLocalization' % self.__class__.__name__))
 
@@ -204,7 +202,7 @@ Now it's time to code proxy, ``proxies.py`` is expected filename of the module *
                         except AttributeError, e:
                             return None
 
-            localizations = (EmptyLocalization(language_code=language_code),)
+                localizations = (EmptyLocalization(language_code=language_code),)
 
             return localizations[0]
 

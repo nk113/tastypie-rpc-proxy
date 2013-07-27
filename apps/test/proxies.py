@@ -26,8 +26,6 @@ class Localizable(proxies.Proxy):
     def __init_proxy__(self):
         super(Localizable, self).__init_proxy__()
 
-        class_name = self.__class__.__name__
-
         setattr(self, 'localization', getattr(import_module(self.__module__),
                                               '%sLocalization' % self.__class__.__name__))
 
