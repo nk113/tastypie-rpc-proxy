@@ -7,20 +7,19 @@ import multiprocessing
 
 
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup
 except ImportError:
     from ez_setup import use_setuptools
     use_setuptools()
-    from setuptools import setup, find_packages
-
+    from setuptools import setup
 
 setup(
     name='tastypie-rpc-proxy',
-    version='0.1.0',
+    version='0.1.1',
     description='An extension of tastypie-queryset-client, designed intended for building RPC based on tastypie.',
     long_description=open('README.rst', 'r').read(),
     url='http://github.com/nk113/tastypie-rpc-proxy/',
-    packages=find_packages(),
+    packages=('rpc_proxy',),
     package_data={'': ['*/fixtures/*.json']},
     zip_safe=False, 
     tests_require=('mock', 'django_nose',),

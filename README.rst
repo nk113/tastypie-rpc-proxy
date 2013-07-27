@@ -31,6 +31,15 @@ Notes
 * setting up `django`_ cache backend is strongly recommended to reduce API requests.
 * defining `tastypie`_ resources inheriting *rpc_proxy.resources.ModelResource* is strongly recommended to fully support foreign key operations. 
 
+Installation
+============
+
+Pip installation is available. Note that this does only install ``rpc_proxy`` library, doesn't contain example ``apps/test`` application.
+
+::
+
+    pip install tastypie-rpc-proxy
+
 Quick Start
 ===========
 
