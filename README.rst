@@ -2,9 +2,9 @@
 tastypie-rpc-proxy
 ==================
 
-.. image:: https://travis-ci.org/nk113/tastiypie-rpc-proxy.png?branch=master
+.. image:: https://travis-ci.org/nk113/tastypie-rpc-proxy.png?branch=master
     :alt: Build Status
-    :target: http://travis-ci.org/nk113/tastiypie-rpc-proxy
+    :target: http://travis-ci.org/nk113/tastypie-rpc-proxy
 
 The concept of **tastypie-rpc-proxy**, an etension of `tastypie-queryset-client`_ - many kudos to the author, is to help coding `tastypie`_ based RPC in easy manner. You can handle remote `tastypie`_ resources as if operating over local `django`_ model objects. Now you don't need to code your business logics and unit tests for both central `django`_ models and API client to read the central data from remote boxes separately - in other word you can deploy the same application code for central API and remote client, **rpc-proxy** looks after everything for you. Don't you think it's convenient if you can code like below to control remote object behind `tastypie`_ API?
 
