@@ -109,7 +109,10 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
         album = fields.ForeignKey(Album, 'album')
         (...)
 
-Configure URLs, separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
+Configure URLs
+--------------
+
+separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
 
 ::
 
@@ -129,6 +132,11 @@ Configure URLs, separate metadata resources from Item resource to demonstrate na
         # v2
         # ...
     )
+
+Create proxies
+--------------
+
+Now it's time to code proxy, ``proxies.py`` is expected as script name for *proxy* classes by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
 
 ::
 
