@@ -42,19 +42,6 @@ class ItemProxy(test.Proxy):
         self.assertEqual(Item.objects.get(source_item_id='a-999@some.service').source_item_id,
                          'a-999@some.service')
 
-    def test_save(self):
-        from apps.test.proxies import Item
-
-        self.assertRaises((client.ObjectDoesNotExist, ObjectDoesNotExist),
-                          lambda: Item.objects.get(source_item_id='a-999@some.service'))
-
-        i = Item.objects.get(source_item_id='a-1@some.service')
-        i.source_item_id = 'a-999@some.service'
-        i.save()
-
-        self.assertEqual(Item.objects.get(source_item_id='a-999@some.service').source_item_id,
-                         'a-999@some.service')
-
     def test_create(self):
         from apps.test.proxies import Item
 
