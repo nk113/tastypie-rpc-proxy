@@ -417,8 +417,6 @@ class ProxyClient(client.Client):
                 new_value = dateparser.parse(value).date()
             elif field_type in ('list', 'json',):
                 new_value = value
-        else:
-            new_value = '%s' % value
 
         if value != new_value:
             logger.debug('to_python (%s <%s>): %s -> %s' % (name,
