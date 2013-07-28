@@ -363,7 +363,7 @@ Unit tests for proxy classes can be ran in both local `django`_ model and remote
 As a simple tastypie client
 ===========================
 
-You can also utilize **rpc_proxy** with no proxy definition - just call remote tastypie API with queryset interface. In this case you can control remote resources with only standard CRUD / REST manner `tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
+You can also utilize **rpc_proxy** with no proxy definition - just call remote tastypie API with queryset interface. In this case **rpc_proxy** doesn't need to be imported in django context and you can control remote resources with only standard CRUD / REST manner `tastypie`_ supports by default. See `tastypie-queryset-client`_ for detailed usages.
 
 ::
 

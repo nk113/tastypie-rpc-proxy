@@ -5,15 +5,39 @@ import slumber
 
 from datetime import datetime
 from dateutil import parser as dateparser
-from django.conf import settings
-from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
-from django.utils.importlib import import_module
-from django.utils.translation import ugettext as _
 from queryset_client import client
 from urllib import urlencode
 from urlparse import urlparse
+
+try:
+
+    # try to import django suite
+    from django.conf import settings
+    from django.core.cache import cache
+    from django.db import models
+    from django.core.exceptions import ObjectDoesNotExist
+    from django.utils.importlib import import_module
+    from django.utils.translation import ugettext as _
+
+except Exception, e:
+
+    class Cache(object):
+
+        def __getattribute__(self, key):
+            return lambda *args: None
+
+    class ObjectDoesNotExist(Exception):
+
+        pass
+
+    def _(text):
+        return text
+
+    settings = object()
+    cache = Cache()
+    models = None
+    import_module = __import__
+
 
 from rpc_proxy import exceptions
 
@@ -610,7 +634,7 @@ class Proxy(object):
     def __init__(self, *args, **kwargs):
 
         if (self._meta.abstract or
-            isinstance(self, models.Model)):
+            (models and isinstance(self, models.Model))):
             super(Proxy, self).__init__(*args, **kwargs)
             return
 
@@ -638,28 +662,28 @@ class Proxy(object):
         if name in PK_ID:
             return get_pk(self)
 
-        if not isinstance(self, models.Model):
+        if models and not isinstance(self, models.Model):
             if name is not '_resource':
                 return getattr(self._resource, name)
 
         raise AttributeError(_('There is no "%s" attribute on this proxy.' % (name,)))
 
     def invalidate(self):
-        if isinstance(self, models.Model):
+        if models and isinstance(self, models.Model):
             pass
         else:
             super(Proxy, self).invalidate()
 
     @property
     def model_name(self):
-        if isinstance(self, models.Model):
+        if models and isinstance(self, models.Model):
             return self.__class__.__name__.lower()
         else:
             return self.model._model_name
 
     @property
     def data(self):
-        if isinstance(self, models.Model):
+        if models and isinstance(self, models.Model):
             dictionary = self.__dict__
             for key, value in dictionary.items():
                 if key.startswith('_'):
