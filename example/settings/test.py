@@ -13,14 +13,7 @@ INSTALLED_APPS += (
 
 
 # logging
-# LOGGING = {}
-LOGGING['loggers'] = {
-    '': {
-        'handlers': ('test_log',),
-        'level': 'CRITICAL',
-        'propagate': True,
-    },
-}
+LOGGING = {}
 
 
 # test
