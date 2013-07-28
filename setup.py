@@ -15,7 +15,7 @@ except ImportError:
 
 setup(
     name='tastypie-rpc-proxy',
-    version='0.1.9',
+    version='0.2.0',
     description='An extension of tastypie-queryset-client, designed intended for building RPC based on tastypie.',
     long_description=open('README.rst', 'r').read(),
     url='http://github.com/nk113/tastypie-rpc-proxy/',
@@ -30,7 +30,7 @@ setup(
         'tastypie-queryset-client',
     ],
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',

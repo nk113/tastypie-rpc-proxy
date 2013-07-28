@@ -497,6 +497,12 @@ SUPERUSER_PASSWORD
 
 String, optional, defines default password of superuser for API authentication, useful to allow internal system user to operate over all remote resources e.g. ``'test'``.
 
+GitHub
+======
+
+https://github.com/nk113/tastypie-rpc-proxy
+
+
 .. _tastypie-queryset-client: https://github.com/ikeikeikeike/tastypie-queryset-client
 .. _tastypie: https://github.com/toastdriven/django-tastypie
 .. _django: https://www.djangoproject.com
