@@ -50,7 +50,7 @@ Notes
 Installation
 ============
 
-Pip installation is available. Note that this does only install ``rpc_proxy`` library, doesn't contain example ``apps/test`` application.
+Pip installation is available. Note that this does only install ``rpc_proxy`` library, doesn't contain example ``example`` application.
 
 ::
 
@@ -59,12 +59,12 @@ Pip installation is available. Note that this does only install ``rpc_proxy`` li
 Quick Start
 ===========
 
-``apps/test`` application is good to start with. Following section goes through the application to describe what you can enjoy from **rpc_proxy**. See the ``apps/test`` application code for the implementation in detail. This test application has models that represent common music data scheme - Album, Track metadata and these localizations. The Item model associates them as parent and child relationship.
+``example`` application is good to start with. Following section goes through the application to describe what you can enjoy from **rpc_proxy**. See the ``example`` application code for the implementation in detail. This test application has models that represent common music data scheme - Album, Track metadata and these localizations. The Item model associates them as parent and child relationship.
 
 Define models
 -------------
 
-First of all, define `django`_ models as usual. The model methods will be implemented on *proxy* classes later instead of on the models so just define model fields here - ``apps/test/models.py``.
+First of all, define `django`_ models as usual. The model methods will be implemented on *proxy* classes later instead of on the models so just define model fields here - ``example/models.py``.
 
 ::
 
@@ -95,7 +95,7 @@ First of all, define `django`_ models as usual. The model methods will be implem
 Define resources
 ----------------
 
-Design `tastypie`_ resources carefully. Might need to have various filters, orderings and access controls - ``apps/test/resources.py``. The resources should be defined inheriting *rpc_proxy.resources.ModelResource* class to support foreign key operations.
+Design `tastypie`_ resources carefully. Might need to have various filters, orderings and access controls - ``example/resources.py``. The resources should be defined inheriting *rpc_proxy.resources.ModelResource* class to support foreign key operations.
 
 ::
 
@@ -111,8 +111,8 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
             resource_name = 'item'
             (...)
 
-        parents = fields.ToManyField('apps.test.resources.Item', 'parents', null=True)
-        children = fields.ToManyField('apps.test.resources.Item', 'children', null=True)
+        parents = fields.ToManyField('example.resources.Item', 'parents', null=True)
+        children = fields.ToManyField('example.resources.Item', 'children', null=True)
         (...)
 
 
@@ -142,7 +142,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
 Configure URLs
 --------------
 
-Separate metadata resources from Item resource to demonstrate namespaces - ``apps/test/urls/url.py``
+Separate metadata resources from Item resource to demonstrate namespaces - ``example/urls/url.py``
 
 ::
 
@@ -166,12 +166,12 @@ Separate metadata resources from Item resource to demonstrate namespaces - ``app
 Create proxies
 --------------
 
-Now it's time to code proxy, ``proxies.py`` is expected filename of the module *proxy* classes are defined by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``apps/test/proxies.py``.
+Now it's time to code proxy, ``proxies.py`` is expected filename of the module *proxy* classes are defined by default. Write business logics usually we write on django models here. Proxies here are implementing some useful methods for localization - ``example/proxies.py``.
 
 ::
 
     (...)
-    from apps.test.models import ITEM_TYPES, META_TYPES
+    from example.models import ITEM_TYPES, META_TYPES
 
     (...)
     def get_default_language_code():
@@ -284,7 +284,7 @@ All right, let's call those proxies with the ``manage.py shell``. After loading 
 
 ::
 
-    >>> from apps.test.proxies import *
+    >>> from example.proxies import *
     >>> a = Album.objects.get(item__source_item_id__startswith='a-1')
     [DEBUG: django.db.backends: execute] (0.001) SELECT "test_album"."ctime", "test_album"."utime", "test_album"."item_id", "test_album"."release_date" FROM "test_album" INNER JOIN "test_item" ON ("test_album"."item_id" = "test_item"."id") WHERE "test_item"."source_item_id" LIKE a-1% ESCAPE '\' ; args=(u'a-1%',)
     >>> a.localize('en').title
@@ -317,7 +317,7 @@ OK then reset database and let's do the same things with *API_URL* settings, you
 
 ::
 
-    >>> from apps.test.proxies import *
+    >>> from example.proxies import *
     (...)
     >>> a = Album.objects.get(item__source_item_id__startswith='a-1')
     [DEBUG: requests.packages.urllib3.connectionpool: _make_request] "GET /api/v1/meta/album/?item__source_item_id__startswith=a-1 HTTP/1.1" 200 None
@@ -358,7 +358,7 @@ That's it! Hope this enpowers you to write clean code and reduce time to code bo
 Testing proxy code
 ==================
 
-Unit tests for proxy classes can be ran in both local `django`_ model and remote `tastypie`_ API context. Those tests should inherit ``rpc_client.test.Proxy`` class. If you are to run the unit tests for both contexts separated settings need to be prepared - API context with *API_URL*, local model context with **NO** *API_URL* settings. Please take a look at how the unit tests for ``apps.test`` application works - see ``runtests.py`` and ``tox.ini``.
+Unit tests for proxy classes can be ran in both local `django`_ model and remote `tastypie`_ API context. Those tests should inherit ``rpc_client.test.Proxy`` class. If you are to run the unit tests for both contexts separated settings need to be prepared - API context with *API_URL*, local model context with **NO** *API_URL* settings. Please take a look at how the unit tests for ``example`` application works - see ``runtests.py`` and ``tox.ini``.
 
 As a simple tastypie client
 ===========================
@@ -390,13 +390,13 @@ You can also utilize **rpc_proxy** with no proxy definition - just call remote t
     >>> str(album.item.children.all()[0].track) == str(track)
     True
 
-.. note:: You have to uncomment following fields on the Item resource in ``apps.test.resources.py`` and to clear cache to work above expectedly though.
+.. note:: You have to uncomment following fields on the Item resource in ``example.resources.py`` and to clear cache to work above expectedly though.
 
 ::
 
     (...)
-    # album = fields.OneToOneField('apps.test.resources.Album', 'album', null=True)
-    # track = fields.OneToOneField('apps.test.resources.Track', 'track', null=True)
+    # album = fields.OneToOneField('example.resources.Album', 'album', null=True)
+    # track = fields.OneToOneField('example.resources.Track', 'track', null=True)
 
 Namespace and Resource Endpoint
 ===============================
