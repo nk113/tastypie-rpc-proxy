@@ -20,6 +20,7 @@ TASTYPIE_RPC_PROXY = {
     'SUPERUSER_PASSWORD': 'test',
 }
 
+
 # django
 ROOT_URLCONF = 'urls.urls'
 WSGI_APPLICATION = 'wsgi.wsgi.application'

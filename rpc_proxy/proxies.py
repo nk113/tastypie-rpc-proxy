@@ -62,7 +62,7 @@ def mixin(cls, mixin):
 def get_setting(name, default=None):
     return getattr(settings, 'TASTYPIE_RPC_PROXY', {}).get(name, default)
 
-def get_pk(obj):
+def get_pk(obj, recursive=False):
     """
     This is a workaroud to seek non default ``id`` primary key value.
     Since queryset_client expects resources to have ``id`` fields as primary key
@@ -83,7 +83,8 @@ def get_pk(obj):
     for key in get_setting('NON_DEFAULT_ID_FOREIGNKEYS', {}):
         if hasattr(obj, key):
             try:
-                return get_pk(getattr(obj, key))
+                if not recursive:
+                    return get_pk(getattr(obj, key), True)
             except AttributeError, e:
                 pass
             else:
