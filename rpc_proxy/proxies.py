@@ -83,10 +83,8 @@ def get_pk(obj):
                 return get_pk(getattr(obj, key))
             except AttributeError, e:
                 pass
-            else:
-                return obj.id
 
-    return None
+    return obj.id
 
 
 class QuerySet(client.QuerySet):
