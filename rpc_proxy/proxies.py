@@ -93,6 +93,12 @@ class QuerySet(client.QuerySet):
         super(QuerySet, self).__init__(model, responses, query, **kwargs)
         self._response_class = Response
 
+    def __getitem__(self, index):
+        try:
+            return super(QuerySet, self).__getitem__(index)
+        except IndexError, e:
+            pass
+
     def _filter(self, *args, **kwargs):
         for key, value in kwargs.items():
             try:
@@ -198,9 +204,10 @@ class Response(client.Response):
         logger.debug('%s: %s, need namespace schema (%s)' % (
             name,
             self._response[name],
-            ProxyClient.build_base_url(base_client._api_url, **{
+            ProxyClient.build_client_key(base_client._api_url, **{
                 'version': base_client._version,
                 'namespace': namespace,
+                'auth': base_client._auth,
             })))
 
         proxy_client = ProxyClient.get(base_client._api_url,
@@ -312,22 +319,23 @@ class ManyToManyManager(client.ManyToManyManager):
 
 class ProxyClient(client.Client):
 
-    _instances = {}
+    _clients = {}
     _proxies = {}
     _models = {}
+    _schemas = {}
 
     def __new__(cls, url, **kwargs):
-        key = ProxyClient.build_base_url(url, **kwargs)
+        key = ProxyClient.build_client_key(url, **kwargs)
 
-        if not key in cls._instances:
-            cls._instances[key] = super(ProxyClient,
-                                        cls).__new__(cls)
+        if not key in cls._clients:
+            cls._clients[key] = super(ProxyClient,
+                                      cls).__new__(cls)
 
         proxy = kwargs.get('proxy')
         if proxy:
             cls._proxies[proxy.__class__.__name__.lower().replace('proxy', '')] = proxy
 
-        return cls._instances[key]
+        return cls._clients[key]
 
     def __init__(self, base_url, auth=None, strict_field=True, client=None, **kwargs):
 
@@ -339,7 +347,7 @@ class ProxyClient(client.Client):
         self._auth      = kwargs.get('auth', auth)
         self._namespace = kwargs.get('namespace', None)
         self._version   = kwargs.get('version', None)
-
+ 
         super(ProxyClient, self).__init__(ProxyClient.build_base_url(base_url,
                                                                      **kwargs),
                                           self._auth,
@@ -450,8 +458,12 @@ class ProxyClient(client.Client):
         else:
             url = self._url_gen('%s/schema/' % model_name)
 
-        if not model_name in self._schema_store:
-            self._schema_store[model_name] = self.request(url)
+        if not model_name in ProxyClient._schemas:
+            try:
+                self._schema_store[model_name] = self.request(url)
+                ProxyClient._schemas[model_name] = self._schema_store[model_name]
+            except Exception, e:
+                logger.debug('couldn\'t fetch schema for some reason (%s)' % model_name)
 
         # try to import namespaced proxies
         try:
@@ -471,7 +483,7 @@ class ProxyClient(client.Client):
             except Exception, e:
                 pass
 
-        return self._schema_store[model_name]
+        return ProxyClient._schemas.get(model_name, {})
 
     def request(self, url, method='GET'):
         nocache = False
@@ -485,12 +497,24 @@ class ProxyClient(client.Client):
             logger.debug('getting cache... (%s)' % url)
 
             result = cache.get(url)
+
             if result is not None:
                 logger.debug('found in cache (%s -> %s)' % (url, result,))
 
                 return result
 
-        result =  super(ProxyClient, self).request(url, method)
+        # override super to handle HTTP response error
+        client = self._main_client._store
+        url = self._url_gen(url)
+        response = client['session'].request(method, url)
+
+        if response.status_code >= 300:
+            raise exceptions.ProxyException('Failed to fetch resource (%s, %s %s)' % (url,
+                                                                                      method,
+                                                                                      response.status_code,))
+
+        serializer = slumber.serialize.Serializer(default=client['format'])
+        result = serializer.loads(response.content)
 
         if not nocache:
             logger.debug('setting cache... (%s -> %s)' % (url, result,))
@@ -505,7 +529,7 @@ class ProxyClient(client.Client):
             return self._proxies
         else:
             resources = {}
-            for resource in self._schema_store.keys():
+            for resource in self._schemas.keys():
                 try:
                     resources[resource] = getattr(self, resource)
                 except AttributeError, e:
@@ -515,16 +539,16 @@ class ProxyClient(client.Client):
 
     @classmethod
     def get(cls, url, **kwargs):
-        key = cls.build_base_url(url, **kwargs)
-        return cls._instances.get(key,
-                                  ProxyClient(url,
-                                              **kwargs))
+        key = cls.build_client_key(url, **kwargs)
+        return cls._clients.get(key,
+                                ProxyClient(url,
+                                            **kwargs))
 
     @classmethod
     def get_by_schema(cls, schema):
-        for instance in cls._instances.values():
-            if schema in instance._schema_store:
-                return instance
+        for client in cls._clients.values():
+            if schema in client._schema_store:
+                return client
         return None
 
     @classmethod
@@ -534,6 +558,15 @@ class ProxyClient(client.Client):
 
         return '%s%s' % ('%s%s' % (url, '/' if not url.endswith('/') else ''),
                          re.sub('//+', '/', '%s/%s' % (version, namespace,)),)
+
+    @classmethod
+    def build_client_key(cls, url, **kwargs):
+        auth = kwargs.get('auth', None)
+        base_url = cls.build_base_url(url, **kwargs).rpartition('://')
+        return '%s%s%s%s' % (base_url[0],
+                             base_url[1],
+                             '%s:%s@' % auth if auth else '',
+                             base_url[2])
 
 
 class ProxyOptions(object):
@@ -643,11 +676,14 @@ class Proxy(object):
                                              proxy=self)
 
         try:
+            class_name = self.__class__.__name__
             self._resource = getattr(self._client,
-                                     self._meta.resource_name or self.__class__.__name__.lower())
+                                     self._meta.resource_name or class_name,
+                                     getattr(self._client,
+                                             self._meta.resource_name or class_name.lower(), None))
         except AttributeError, e:
-            raise exceptions.ProxyException(_('API seems not to have endpoint '
-                                              'for the resource (%s).' % resource_name))
+            logger.debug('API seems not to have endpoint '
+                         'for the resource (%s).' % class_name)
 
     def __init_proxy__(self):
         pass
@@ -656,7 +692,7 @@ class Proxy(object):
         if name in PK_ID:
             return get_pk(self)
 
-        if models and not isinstance(self, models.Model):
+        if not models or (models and not isinstance(self, models.Model)):
             if name is not '_resource':
                 return getattr(self._resource, name)
 
