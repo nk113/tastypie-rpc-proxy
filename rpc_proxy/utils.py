@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import re
 
 def logf(data):
     sequence = []
