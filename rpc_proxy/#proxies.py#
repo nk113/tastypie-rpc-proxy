@@ -129,10 +129,10 @@ class Response(client.Response):
 
     def __init__(self, model, response=None, url=None, **kwargs):
         # implement proxy mixin
-        model_name = model._model_name.lower()
-        if model_name in ProxyClient._proxies:
-            proxy = ProxyClient._proxies[model_name].__class__
-            extend(self, proxy, proxy.__dict__.copy())
+        if model._model_name in ProxyClient._proxies:
+            proxy = ProxyClient._proxies[model._model_name].__class__
+            # extend(self, proxy, proxy.__dict__.copy())
+            extend(self, proxy)
             self.__init_proxy__()
 
         super(Response, self).__init__(model, response, url, **kwargs)
@@ -143,7 +143,7 @@ class Response(client.Response):
     def __repr__(self):
         if hasattr(self, 'resource_uri'):
             return self.resource_uri
-        return '<%s: None>' % self.model._model_name.title()
+        return '<%s: None>' % self.model._model_name
 
     def __getattr__(self, name):
         """
@@ -337,7 +337,7 @@ class ProxyClient(client.Client):
 
         proxy = kwargs.get('proxy')
         if proxy:
-            cls._proxies[proxy.__class__.__name__.replace('Proxy', '').lower()] = proxy
+            cls._proxies[proxy.__class__.__name__.replace('Proxy', '')] = proxy
 
         return cls._clients[key]
 
