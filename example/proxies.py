@@ -6,6 +6,7 @@ from django.utils.importlib import import_module
 
 from rpc_proxy import exceptions
 from rpc_proxy import proxies
+from rpc_proxy.utils import logf
 
 from example.models import ITEM_TYPES, META_TYPES
 
@@ -94,9 +95,13 @@ class Item(proxies.Proxy):
             meta = getattr(import_module(self.__module__),
                            self.meta_type_display)
         except Exception, e:
-            logger.exception(e)
-            raise exceptions.ProxyException(_('No metadata model for '
-                                              '%s found.' % self.meta_type_display))
+            logger.exception(logf({
+                'message': 'No metadata model found.',
+                'meta_type': self.meta_type_display,
+                'exception': e,
+            }))
+            raise exceptions.ProxyException('No metadata model for '
+                                            '%s found.' % self.meta_type_display)
 
         return meta.objects.get(item=self)
 

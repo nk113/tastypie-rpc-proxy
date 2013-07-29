@@ -40,6 +40,7 @@ except Exception, e:
 
 
 from rpc_proxy import exceptions
+from rpc_proxy.utils import logf
 
 
 PK_ID = ('pk', 'id',)
@@ -183,8 +184,11 @@ class Response(client.Response):
                         schema_uri = schema_uri['resource_uri'] if (
                             isinstance(schema_uri, dict)) else schema_uri
 
-                        logger.debug('trying to guess schema info from '
-                                     'schema_uri (%s).' % schema_uri)
+                        logger.debug(logf({
+                            'message': 'Trying to guess schema info from '
+                                       'schema_uri.',
+                            'schema_uri': schema_uri,
+                        }))
                     except Exception, e:
                         raise exceptions.ProxyException(_('Couldn\'t identify related '
                                                           'field schema (%s).') % name)
@@ -204,14 +208,16 @@ class Response(client.Response):
         if version in paths: paths.remove(version)
         namespace = '/'.join(paths)
 
-        logger.debug('%s: %s, need namespace schema (%s)' % (
-            name,
-            self._response[name],
-            ProxyClient.build_client_key(base_client._api_url, **{
+        logger.debug(logf({
+            'message': 'Need namespace schema.',
+            'attribute': name,
+            'resource_uri': self._response[name],
+            'client_key': ProxyClient.build_client_key(base_client._api_url, **{
                 'version': base_client._version,
                 'namespace': namespace,
                 'auth': base_client._auth,
-            })))
+            }),
+        }))
 
         proxy_client = ProxyClient.get(base_client._api_url,
                                        version=base_client._version,
@@ -244,12 +250,18 @@ class Response(client.Response):
         serializer = slumber.serialize.Serializer(default=self.model._main_client._store['format'])
 
         if self._url is not None:
-            logger.debug('getting cache... (%s)' % self._url)
+            logger.debug(logf({
+                'message': 'Getting cache...',
+                'key': self._url,
+            }))
 
             cached = cache.get(self._url)
             if cached:
-                logger.debug('found in cache (%s -> %s)' % (self._url,
-                                                          cached,))
+                logger.debug(logf({
+                    'message': 'Found in cache.',
+                    'key': self._url,
+                    'value': cached,
+                }))
 
                 self.refresh(serializer.loads(cached))
                 return self.__response
@@ -262,8 +274,11 @@ class Response(client.Response):
 
             content = serializer.dumps(response)
 
-            logger.debug('setting cache... (%s -> %s)' % (self._url,
-                                                           content))
+            logger.debug(logf({
+                'message': 'Setting cache...',
+                'key': self._url,
+                'value': content,
+            }))
 
             cache.set(self._url, content)
 
@@ -429,10 +444,13 @@ class ProxyClient(client.Client):
                 new_value = value
 
         if value != new_value:
-            logger.debug('to_python (%s <%s>): %s -> %s' % (name,
-                                                            field_type,
-                                                            value.__repr__(),
-                                                            new_value.__repr__()))
+            logger.debug(logf({
+                'message': 'Converting to python...',
+                'field': name,
+                'type': field_type,
+                'from': value.__repr__(),
+                'to': new_value.__repr__(),
+            }))
 
         obj._fields[name] = new_value
 
@@ -444,10 +462,13 @@ class ProxyClient(client.Client):
             new_value = value.isoformat()
 
         if value != new_value:
-            logger.debug('to_serializable (%s <%s>): %s -> %s' % (name,
-                                                                  field_type,
-                                                                  value.__repr__(),
-                                                                  new_value.__repr__()))
+            logger.debug(logf({
+                'message': 'Serializing from python...',
+                'field': name,
+                'type': field_type,
+                'from': value.__repr__(),
+                'to': new_value.__repr__()
+            }))
             return new_value
 
         raise exceptions.ProxyException(_('Raise to call super.'))
@@ -467,7 +488,10 @@ class ProxyClient(client.Client):
                 self._schema_store[model_name] = self.request(url)
                 ProxyClient._schemas[model_name] = self._schema_store[model_name]
             except Exception, e:
-                logger.debug('couldn\'t fetch schema for some reason (%s)' % model_name)
+                logger.debug(logf({
+                    'message': 'Couldn\'t fetch the schema definition for some reason.',
+                    'schema': model_name,
+                }))
 
         # try to import namespaced proxies
         try:
@@ -481,9 +505,13 @@ class ProxyClient(client.Client):
                                     module,)
                 import_module(module)
             except ImportError, e:
-                logger.debug('proxies module not found (%s), '
-                             'the namespace might not be structured based on '
-                             'actual class path.' % module)
+                logger.debug(logf({
+                    'message': 'Proxies module not found, '
+                               'the namespace might not be structured based on '
+                               'actual class path.',
+                    'module': module,
+                }))
+
             except Exception, e:
                 pass
 
@@ -493,17 +521,27 @@ class ProxyClient(client.Client):
         nocache = False
 
         if method != 'GET':
-            logger.debug('deleting cache... (%s)' % url)
+            logger.debug(logf({
+                'message': 'Deleting cache...',
+                'key': url,
+            }))
 
             cache.delete(url)
             nocache = True
         else:
-            logger.debug('getting cache... (%s)' % url)
+            logger.debug(logf({
+                'message': 'Getting cache...',
+                'key': url,
+            }))
 
             result = cache.get(url)
 
             if result is not None:
-                logger.debug('found in cache (%s -> %s)' % (url, result,))
+                logger.debug(logf({
+                    'message': 'Found in cache.',
+                    'key': url,
+                    'value': result,
+                }))
 
                 return result
 
@@ -521,7 +559,11 @@ class ProxyClient(client.Client):
         result = serializer.loads(response.content)
 
         if not nocache:
-            logger.debug('setting cache... (%s -> %s)' % (url, result,))
+            logger.debug(logf({
+                'message': 'Setting cache...',
+                'url': url,
+                'value': result,
+            }))
 
             cache.set(url, result)
 
@@ -686,8 +728,10 @@ class Proxy(object):
                                      getattr(self._client,
                                              self._meta.resource_name or class_name.lower(), None))
         except AttributeError, e:
-            logger.debug('API seems not to have endpoint '
-                         'for the resource (%s).' % class_name)
+            logger.debug(logf({
+                'message': 'API seems not to have endpoint for the resource.',
+                'resource': class_name,
+            }))
 
     def __init_proxy__(self):
         pass

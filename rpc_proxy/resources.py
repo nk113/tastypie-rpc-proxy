@@ -12,6 +12,8 @@ from tastypie.cache import SimpleCache
 from tastypie.resources import ModelResource as TastypieModelResource
 from tastypie.throttle import CacheThrottle
 
+from rpc_proxy.utils import logf
+
 
 ALL_METHODS = ('get', 'post', 'put', 'patch', 'delete',)
 
@@ -63,19 +65,24 @@ class ModelResource(TastypieModelResource):
     def debug(self, request, response, log=logger.debug):
         info = log if log == logger.exception else logger.info
 
-        info('API (%s): %s %s %s%s' % (
-             request.user,
-             request.method, response.status_code,
-             request.META.get('PATH_INFO'),
-             '?%s' % request.META.get('QUERY_STRING') if len(request.META.get('QUERY_STRING', '')) else ''))
+        data = {
+            'message': 'API called.',
+            'user': request.user,
+            'method': request.method,
+            'status_code': response.status_code,
+            'path_info': request.META.get('PATH_INFO'),
+            'query_string': request.META.get('QUERY_STRING'),
+        }
+
+        info(logf(data))
 
         if len(request.raw_post_data):
-            log('API (%s): Post Data: %s' % (
-                request.user, request.raw_post_data.decode('utf-8'),))
+            data['post_data'] = request.raw_post_data.decode('utf-8')
 
         if len(response.content):
-            log('API (%s): Response Content: %s' % (request.user,
-                                                     response.content.decode('utf-8'),))
+            data['response'] = response.content.decode('utf-8')
+
+        log(logf(data))
 
     def dispatch(self, request_type, request, **kwargs):
         # this needs to be called before method check
@@ -86,7 +93,10 @@ class ModelResource(TastypieModelResource):
                                                            request,
                                                            **kwargs)
         except Exception, e:
-            logger.exception('A fatal error has occurred during processing dispatch: %s' % e)
+            logger.exception(logf({
+                'message': 'A fatal error has occurred during processing dispatch',
+                'exception': e,
+            }))
             raise e
 
         self.debug(request, response)
@@ -99,7 +109,10 @@ class ModelResource(TastypieModelResource):
         # allow superuser all operations dynamically
         if request.user.is_superuser:
 
-            logger.debug('Hello superuser you can do anything with this resource (%s)' % request.META['PATH_INFO'])
+            logger.debug(logf({
+                'message': 'Hello superuser you can do anything with this resource.',
+                'resource': request.META['PATH_INFO'],
+            }))
 
             self._meta.list_allowed_methods = ALL_METHODS
             self._meta.detail_allowed_methods = ALL_METHODS
