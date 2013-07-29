@@ -2,6 +2,7 @@
 Django
 django-nose
 mock
+mimeparse
 python-memcached
 tastypie-queryset-client
 tox
