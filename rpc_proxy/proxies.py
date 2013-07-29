@@ -585,7 +585,7 @@ class ProxyMeta(type):
         if not proxy._meta.model:
             try:
                 proxy._meta.model = getattr(import_module('%s.models' % proxy.__module__.rpartition('.')[0]), name)
-            except (ImportError, AttributeError) as e:
+            except Exception, e:
                 pass
 
         if proxy._meta.api_url:
