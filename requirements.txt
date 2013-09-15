@@ -1,9 +1,9 @@
 # latest revision
+coverage
 Django
 django-nose
 mock
 mimeparse
-python-coveralls
 python-memcached
 tastypie-queryset-client
 tox
