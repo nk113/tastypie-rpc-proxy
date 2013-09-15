@@ -3,7 +3,6 @@ import json
 import logging
 
 from django.conf import settings
-from functools import wraps
 from tastypie import fields
 from tastypie.resources import ModelResource as TastypieModelResource
 
