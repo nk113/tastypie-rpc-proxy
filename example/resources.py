@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from django.contrib.auth.models import User
 from django.utils.importlib import import_module
 from tastypie import fields
+from tastypie.authentication import BasicAuthentication
+from tastypie.authorization import DjangoAuthorization
 from tastypie.http import HttpForbidden
 from tastypie.resources import ALL, ALL_WITH_RELATIONS
+from tastypie.cache import SimpleCache
+from tastypie.throttle import CacheThrottle
 
 from example import models
 from rpc_proxy import resources
@@ -13,9 +18,33 @@ from rpc_proxy import resources
 logger = logging.getLogger(__name__)
 
 
+class Throttle(CacheThrottle):
+
+    def should_be_throttled(self, identifier, **kwargs):
+        try:
+            user = User.objects.get(username=identifier)
+            if user.is_superuser:
+                return False
+        except User.DoesNotExist, e:
+            pass
+
+        return super(Throttle, self).should_be_throttled(identifier,
+                                                         **kwargs)
+
+
+class BaseMeta(object):
+
+    allowed_methods = ('get',)
+    authentication = BasicAuthentication()
+    authorization = DjangoAuthorization()
+    cache = SimpleCache()
+    ordering = ('id',)
+    throttle = Throttle()
+
+
 class Item(resources.ModelResource):
 
-    class Meta(resources.SuperuserMeta):
+    class Meta(BaseMeta):
 
         queryset = models.Item.objects.all()
         resource_name = 'item'
@@ -33,7 +62,7 @@ class Item(resources.ModelResource):
 
 class Album(resources.ModelResource):
 
-    class Meta(resources.SuperuserMeta):
+    class Meta(BaseMeta):
 
         queryset = models.Album.objects.all()
         resource_name = 'album'
@@ -48,7 +77,7 @@ class Album(resources.ModelResource):
 
 class AlbumLocalization(resources.ModelResource):
 
-    class Meta(resources.SuperuserMeta):
+    class Meta(BaseMeta):
 
         queryset = models.AlbumLocalization.objects.all()
         resource_name = 'albumlocalization'
@@ -63,7 +92,7 @@ class AlbumLocalization(resources.ModelResource):
 
 class Track(resources.ModelResource):
 
-    class Meta(resources.SuperuserMeta):
+    class Meta(BaseMeta):
 
         queryset = models.Track.objects.all()
         resource_name = 'track'
@@ -78,7 +107,7 @@ class Track(resources.ModelResource):
 
 class TrackLocalization(resources.ModelResource):
 
-    class Meta(resources.SuperuserMeta):
+    class Meta(BaseMeta):
 
         queryset = models.TrackLocalization.objects.all()
         resource_name = 'tracklocalization'

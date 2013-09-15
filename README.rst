@@ -108,7 +108,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
     (...)
     class Item(resources.ModelResource):
 
-        class Meta(resources.SuperuserMeta):
+        class Meta(BaseMeta):
 
             queryset = models.Item.objects.all()
             resource_name = 'item'
@@ -121,7 +121,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
 
     class Album(resources.ModelResource):
 
-        class Meta(resources.SuperuserMeta):
+        class Meta(BaseMeta):
 
             queryset = models.Album.objects.all()
             resource_name = 'album'
@@ -133,7 +133,7 @@ Design `tastypie`_ resources carefully. Might need to have various filters, orde
 
     class AlbumLocalization(resources.ModelResource):
 
-        class Meta(resources.SuperuserMeta):
+        class Meta(BaseMeta):
 
             queryset = models.AlbumLocalization.objects.all()
             resource_name = 'albumlocalization'

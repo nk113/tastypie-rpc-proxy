@@ -2,15 +2,10 @@
 import json
 import logging
 
-from django.contrib.auth.models import User
 from django.conf import settings
 from functools import wraps
 from tastypie import fields
-from tastypie.authentication import BasicAuthentication
-from tastypie.authorization import DjangoAuthorization
-from tastypie.cache import SimpleCache
 from tastypie.resources import ModelResource as TastypieModelResource
-from tastypie.throttle import CacheThrottle
 
 from rpc_proxy.utils import logf
 
@@ -18,33 +13,6 @@ from rpc_proxy.utils import logf
 ALL_METHODS = ('get', 'post', 'put', 'patch', 'delete',)
 
 logger = logging.getLogger(__name__)
-
-
-class SuperuserAuthentication(BasicAuthentication):
-
-    def is_authenticated(self, request, **kwargs):
-        authenticated = super(SuperuserAuthentication,
-                              self).is_authenticated(request, **kwargs)
-        return request.user.is_superuser
-
-
-class SuperuserAuthorization(DjangoAuthorization):
-
-    pass
-
-
-class Throttle(CacheThrottle):
-
-    def should_be_throttled(self, identifier, **kwargs):
-        try:
-            user = User.objects.get(username=identifier)
-            if user.is_superuser:
-                return False
-        except User.DoesNotExist, e:
-            pass
-
-        return super(Throttle, self).should_be_throttled(identifier,
-                                                         **kwargs)
 
 
 class ModelResource(TastypieModelResource):
@@ -134,17 +102,3 @@ class ModelResource(TastypieModelResource):
                 schema['fields'][field_name]['schema'] = field_object.to_class().get_resource_uri(url_name='api_get_schema')
 
         return schema
-
-
-class Meta(object):
-
-    allowed_methods = ('get',)
-    cache = SimpleCache()
-    ordering = ('id',)
-    throttle = Throttle()
-
-
-class SuperuserMeta(Meta):
-
-    authentication = SuperuserAuthentication()
-    authorization = SuperuserAuthorization()
