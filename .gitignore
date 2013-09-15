@@ -4,6 +4,7 @@
 *.log
 *.pot
 *.pyc
+.coverage
 .DS_Store
 .noseids
 .tox

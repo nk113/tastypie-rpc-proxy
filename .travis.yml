@@ -9,7 +9,7 @@ env:
 
 # command to install dependencies
 install:
-  - pip install tox multiprocessing coverage
+  - pip install tox multiprocessing coveralls
 
 # command to run tests
 script:
