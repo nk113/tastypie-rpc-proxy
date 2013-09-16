@@ -2,6 +2,12 @@
 tastypie-rpc-proxy
 ==================
 
+.. image:: https://badge.fury.io/py/tastypie-rpc-proxy.png
+    :alt: Pypi Package
+    :target: https://pypi.python.org/pypi/tastypie-rpc-proxy
+.. image:: https://pypip.in/d/tastypie-rpc-proxy/badge.png
+    :alt: Downloads
+    :target: https://crate.io/packages/tastypie-rpc-proxy
 .. image:: https://travis-ci.org/nk113/tastypie-rpc-proxy.png?branch=master
     :alt: Build Status
     :target: http://travis-ci.org/nk113/tastypie-rpc-proxy
